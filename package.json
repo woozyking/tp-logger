@@ -1,0 +1,22 @@
+{
+  "name": "tp-logger",
+  "version": "0.1.0",
+  "description": "Supplement log messages with a timestamp and caller's path",
+  "main": "index.js",
+  "keywords": [
+    "logging",
+    "log",
+    "logs",
+    "logger",
+    "utility"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/woozyking/tp-logger.git"
+  },
+  "author": "Runzhou Li (Leo) <me@runzhou.li>",
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.10.6"
+  }
+}
