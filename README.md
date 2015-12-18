@@ -33,13 +33,14 @@ logger.error(new Error('helldivers').stack);
 If you don't mind your coworkers wondering why node.js `console` has suddenly become so awesome (or bad), you can also do:
 
 ```javascript
+// NOT Recommended
 console = require('tp-logger')(/* optional options, see Options below */);
 // ...
 ```
 
 ## Options
 
-All options are optional, as demonstrated above. Seem them in action by running <examples/options.js>
+See them in action by running [this example](examples/options.js)
 
 ```javascript
 var logger = require('tp-logger')({
