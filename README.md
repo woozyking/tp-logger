@@ -1,6 +1,6 @@
 # tp-logger
 
-Supplement log messages with a __T__imestamp and caller's __P__ath.
+Supplement log messages with a Timestamp and caller's Path.
 
 ## Install
 
@@ -39,18 +39,28 @@ console = require('tp-logger')(/* optional options, see Options below */);
 
 ## Options
 
-All options are optional, as demonstrated above.
+All options are optional, as demonstrated above. Seem them in action by running <examples/options.js>
 
 ```javascript
 var logger = require('tp-logger')({
   // stream for log() and info()
-  stdout: <writable stream instances. Default to process.stdout>,
+  stdout: <writable stream instances. Default: process.stdout>,
+
   // stream for error()
-  stderr: <writable stream instances. Default to process.stderr>,
+  stderr: <writable stream instances. Default: process.stderr>,
+
   // whether to use local time or UTC time
-  local: <boolean. Default behavior is as false>,
-  // timestamp format, since moment.js is used for this
-  // see moment.js formatting documentation
-  tsFormat: <string>
+  local: <boolean. Default: false>,
+  localTs: <Alias of 'local'. Since 0.2>,
+
+  // timestamp format
+  tsFormat: <string. See moment.js formatting documentation>,
+
+  // whether to log full path of the caller or just caller filename
+  fullPath: <boolean. Default: false. Since 0.2>,
+
+  // whether to log with a third supplement of [log|info|err]
+  // default to true when stdout == stderr, otherwise false
+  logType: <boolean. Default: depends on whether stdout == stderr. Since 0.2>
 });
 ```
