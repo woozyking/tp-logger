@@ -59,3 +59,16 @@ var tpLogger = (function(opt) {
 });
 
 module.exports = tpLogger;
+
+/*
+  Express compatible error handling middleware that logs error stacks, takes
+  same options as tpLogger.
+*/
+module.exports.middleware = (function(opt) {
+  var logger = tpLogger(opt);
+
+  return function(err, req, res, next) {
+    logger.error(err.stack || err.message || err);
+    next(err);
+  };
+});

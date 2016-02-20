@@ -38,6 +38,23 @@ console = require('tp-logger')(/* optional options, see Options below */);
 // ...
 ```
 
+`Since 0.3.0` If you use express.js, you can also use the middleware provided to log errors passed on by request handlers in a centralize fashion:
+
+```javascript
+var app = require('express')();
+var loggerMw = require('tp-logger').middleware(/* same optional options supported, see Options below */);
+
+app.get('/', function(req, res, next) {
+  // handling request
+  // ...
+  // something went wrong, a wild error appeared
+  return next(error);
+});
+
+// plug in our logger middleware to log handler passed errors
+app.use(loggerMw);
+```
+
 ## Options
 
 See them in action by running [this example](examples/options.js)
