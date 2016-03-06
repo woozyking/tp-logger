@@ -1,74 +1,145 @@
-// node.js built-in
+/* jshint esversion: 6 */
+/* jshint node: true */
+'use strict';
+
 var path = require('path');
-var format = require('util').format;
-var Console = require('console').Console;
-// 3rd party
+var util = require('util');
+var _Console = require('console').Console;
 var moment = require('moment');
 
 /*
-  Module entry point responsible for taking in some options to adjust behavior
+  Class: TPLogger
 
-  Example
-  opt = {
-    stdout: <writable stream instances. Default: process.stdout>,
-    stderr: <writable stream instances. Default: process.stderr>,
-    local: <boolean. Default: false>,
-    localTs: <Alias of 'local'. Since 0.2>,
-    tsFormat: <string. See moment.js formatting documentation>,
-    fullPath: <boolean. Default: false. Since 0.2>,
-    logType: <boolean. Default: depends on whether stdout == stderr. Since 0.2>
+  Subclass of native Console. Since 0.4.
+*/
+class TPLogger extends _Console {
+  /*
+    new TPLogger(opt)
+
+    opt = {
+      stdout: <writable stream instances. Default: process.stdout>,
+      stderr: <writable stream instances. Default: process.stderr>,
+      localTs: <boolean. Default: false>,
+      tsFormat: <string. See moment.js formatting documentation>,
+      fullPath: <boolean. Default: false. Since 0.2>,
+      logType: <boolean. Default: depends on whether stdout == stderr. Since 0.2>,
+      pid: <boolean. Default: false. Since 0.4>
+    }
+  */
+  constructor(opt) {
+    opt = opt || {};
+    var stdout = opt.stdout || process.stdout;
+    var stderr = opt.stderr || process.stderr;
+
+    super(stdout, stderr);
+
+    this._opt = opt;
   }
-*/
-var tpLogger = (function(opt) {
-  opt = opt || {};
-  opt.stdout = opt.stdout || process.stdout;
-  opt.stderr = opt.stderr || process.stderr;
 
-  // This is nothing but a simple duplicate of standard console found in node.js
-  var logger = new Console(opt.stdout, opt.stderr);
+  /*
+    Generate meta info as string. Used as supplement before log msg Since 0.4.
 
-  // override the following console methods
-  ['log', 'info', 'error'].forEach(function(method) {
-    // original method
-    var orig = logger[method].bind(logger);
+    `opt` follows the same rule as constructor argument.
+  */
+  meta(method, opt) {
+    // allows on the fly opt, defaults to this._opt
+    opt = opt || this._opt;
 
-    // add a healthy dose of supplements to log messages
-    logger[method] = function() {
-      // supplement of time
-      var ts = ((opt.local || opt.localTs) ? moment() : moment.utc()).format(opt.tsFormat);
-      // supplement of path
-      var callerPath = opt.fullPath ? process.mainModule.filename : path.basename(process.mainModule.filename);
-      // assemble all supplements
-      var supp = format('[%s][%s]', ts, callerPath);
+    // supplement of time
+    var ts = ((opt.local || opt.localTs) ? moment() : moment.utc()).format(opt.tsFormat);
+    // supplement of path
+    var callerPath = opt.fullPath ? process.mainModule.filename : path.basename(process.mainModule.filename);
+    // assemble all supplements
+    var supp = util.format('[%s][%s]', ts, callerPath);
 
-      // if logType option is true, or when stdout and stderr are the same
-      if (opt.logType || (opt.stdout == opt.stderr)) {
-        // supplement of log type
-        supp += format('[%s]', method);
-      }
+    // if logType option is true, or when stdout and stderr are the same
+    if (opt.logType || (this._opt.stdout && this._opt.stderr && (this._opt.stdout == this._opt.stderr))) {
+      // supplement of log type
+      supp += util.format('[%s]', method || 'log');
+    }
 
-      // Prepend supplements, followed by original log message
-      orig.apply(logger, [
-        supp,
-        format.apply(format, Array.prototype.slice.call(arguments))
-      ]);
-    };
-  });
+    // if pid option is true
+    if (opt.pid) {
+      supp += util.format('[%s]', process.pid);
+    }
 
-  return logger;
-});
+    return supp;
+  }
 
-module.exports = tpLogger;
+  log() {
+    super.log.apply(this, [
+      this.meta('log'),
+      util.format.apply(this, arguments)
+    ]);
+  }
 
-/*
-  Express compatible error handling middleware that logs error stacks, takes
-  same options as tpLogger.
-*/
-module.exports.middleware = (function(opt) {
-  var logger = tpLogger(opt);
+  info() {
+    this.log.apply(this, arguments);
+  }
+
+  // Since 0.4.
+  warn() {
+    super.warn.apply(this, [
+      this.meta('warn'),
+      util.format.apply(this, arguments)
+    ]);
+  }
+
+  error() {
+    super.error.apply(this, [
+      this.meta('error'),
+      util.format.apply(this, arguments)
+    ]);
+  }
+
+  // on the fly opt override. Since 0.4.
+  logOnce() {
+    var args = Array.prototype.slice.call(arguments);
+    var opt = args.shift() || {};
+
+    super.log.apply(this, [
+      this.meta('log', opt),
+      util.format.apply(this, args)
+    ]);
+  }
+
+  infoOnce() {
+    this.logOnce.apply(this, arguments);
+  }
+
+  warnOnce(opt) {
+    var args = Array.prototype.slice.call(arguments);
+    var opt = args.shift() || {};
+
+    super.warn.apply(this, [
+      this.meta('warn', opt),
+      util.format.apply(this, args)
+    ]);
+  }
+
+  errorOnce(opt) {
+    var args = Array.prototype.slice.call(arguments);
+    var opt = args.shift() || {};
+
+    super.error.apply(this, [
+      this.meta('error', opt),
+      util.format.apply(this, args)
+    ]);
+  }
+}
+
+module.exports = function(opt) {
+  return new TPLogger(opt);
+};
+
+module.exports.TPLogger = TPLogger;
+
+// Express.js compatible error handling middleware. Since 0.3.
+module.exports.middleware = function(opt) {
+  var logger = new TPLogger(opt);
 
   return function(err, req, res, next) {
-    logger.error(err.stack || err.message || err);
+    logger.error(err.stack);
     next(err);
   };
-});
+};

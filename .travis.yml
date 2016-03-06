@@ -1,0 +1,11 @@
+sudo: false
+language: node_js
+node_js:
+  - "stable"
+  - "4.3"
+  - "0.12"
+script: npm run-script cover
+after_script: npm run-script codeclimate
+addons:
+  code_climate:
+    repo_token: ef671eeca084acdb3d1d550a8dfbab06198d88284d2b766b6c4c3c83e6778fca
