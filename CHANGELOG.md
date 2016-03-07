@@ -3,6 +3,7 @@
 This version brings back compatibility to older Node.js version (tested on Node.js 0.12) by ES5 standard prototyping and Node.js `util.inherits`. This was justified further with reduced code duplication. 
 
 * __Fixes__ several bug risks reported by code climate.
+* __UNBREAKS__ Node.js 0.12 support.
 
 # v1.0 (2016-03-06)
 

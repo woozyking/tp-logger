@@ -8,6 +8,8 @@ var tpLogger = require('../index');
 var TPLogger = tpLogger.TPLogger;
 var middleware = tpLogger.middleware;
 
+
+
 describe('Class: TPLogger', function() {
   describe('new TPLogger([opt])', function() {
     it('should create an instance of TPLogger and Console', function() {
@@ -138,12 +140,11 @@ describe('Class: TPLogger', function() {
   describe('#log|info|warn|error()', function() {
     it('should have supplements before intended message', function() {
       var actual = '';
-      var writable = new Writable({
-        write: function(chunk, encoding, next) {
-          actual = chunk.toString();
-          next();
-        }
-      });
+      var writable = new Writable();
+      writable._write = function(chunk, encoding, next) {
+        actual = chunk.toString();
+        next();
+      };
       var logger = new TPLogger({
         stdout: writable,
         stderr: writable
@@ -160,11 +161,11 @@ describe('Class: TPLogger', function() {
     });
 
     it('should invoke #meta() method exactly once', function() {
-      var writable = new Writable({
-        write: function(chunk, encoding, next) {
-          next();
-        }
-      });
+      var writable = new Writable();
+      writable._write = function(chunk, encoding, next) {
+        actual = chunk.toString();
+        next();
+      };
       var logger = new TPLogger({
         stdout: writable,
         stderr: writable
@@ -215,11 +216,11 @@ describe('Class: TPLogger', function() {
     });
 
     it('should invoke #meta() method exactly once', function() {
-      var writable = new Writable({
-        write: function(chunk, encoding, next) {
-          next();
-        }
-      });
+      var writable = new Writable();
+      writable._write = function(chunk, encoding, next) {
+        actual = chunk.toString();
+        next();
+      };
       var logger = new TPLogger({
         stdout: writable,
         stderr: writable
