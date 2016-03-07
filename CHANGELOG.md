@@ -1,10 +1,12 @@
-# v0.4 (2016-03-05)
+# v0.4 (2016-03-06)
 
-* __Adds__ `pid` option. When `true`, messages logged are supplemented by `process.pid`.
-* __Adds__ `logOnce(opt)`, `infoOnce(opt)`, and `errorOnce(opt)` methods for on the fly opt adaptation that once.
-* __Adds__ `meta(method[, opt])` method that returns log message supplement portion.
+This version went through a rewrite using ES6 style class instead of the previous "monkey-patching" way.
+
 * __Adds__ `Class: TPLogger` that can be required and extended if necessary.
-* _Internal_ full rewrite using ES6 style class extension.
+* __Adds__ `pid` option. When `true`, messages logged are supplemented by `process.pid`.
+* __Adds__ `warn` method.
+* __Adds__ `logOnce`, `infoOnce`, `warnOnce`, and `errorOnce` methods for on the fly opt adaptation that once.
+* __Adds__ `meta` method that returns log message supplement portion.
 
 # v0.3 (2016-02-20)
 
@@ -15,8 +17,8 @@
 
 * __Adds__ `fullPath` option. When `true`, messages logged are supplemented by caller's full path rather than just "base name" (module's file name). Defaults to `false`.
 * __Adds__ `localTs` option, alias of `local` option for now, and in future versions will be the preferred one as `local` is ambiguous.
-* __Adds__ new behavior when both `stdout` and `stderr` point to the same stream, in which case messages logged contain a third supplement of [`info|log|error`] log type specification.
-* __Adds__ `logType` option. When `true`, logger behaves the same as when both `stdout` and `stderr` point to the same stream. Default depends on whether `stdout` and `stderr` point to the same stream or not.
+* __Adds__ new behavior when both `stdout` and `stderr` point to the same stream, in which case messages logged contain a supplement of [`info|log|error`] log type specification.
+* __Adds__ `logType` option. When true, supplement with the log type. Enforced to true when `stdout` and `stderr` point to the same writable stream.
 
 # v0.1 (2015-12-16)
 

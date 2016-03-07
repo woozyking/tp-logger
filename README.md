@@ -1,6 +1,6 @@
 # tp-logger
 
-Supplement log messages with a Timestamp and caller's Path.
+Supplement log messages with a Timestamp and caller's Path, with options for more.
 
 ## Install
 
@@ -17,6 +17,9 @@ logger.log('lol: %d hours', 2);
 
 logger.info('dota');
 // [2015-12-16T06:49:08+00:00][vanilla.js] dota
+
+logger.warn('cs:go'); // added since 0.4
+// [2015-12-16T06:49:08+00:00][vanilla.js] cs:go
 
 logger.error(new Error('helldivers').stack);
 // [2015-12-16T06:49:08+00:00][vanilla.js] Error: helldivers
@@ -38,7 +41,31 @@ console = require('tp-logger')(/* optional options, see Options below */);
 // ...
 ```
 
-`Since 0.3.0` If you use express.js, you can also use the middleware provided to log errors passed on by request handlers in a centralize fashion:
+`Since 0.4` The underlying implementation has changed to an ES6 style class that extends the Node.js native `Class: Console`, making it simpler to extend. See [Class: TPLogger](#class-tplogger) section for details.
+
+```javascript
+var TPLogger = require('tp-logger').TPLogger;
+var logger = new TPLogger(/* optional options, see Options below */);
+
+console.log(logger instanceof TPLogger); // true
+console.log(logger instanceof require('console').Console); // true
+
+logger.logOnce({
+  fullPath: true // change on the fly behavior
+}, 'Log Message');
+// [2015-12-16T06:49:08+00:00][/full/path/to/class.js] Log Message
+
+logger.meta({
+  pid: true // also supports on the fly opt change
+});
+// [2015-12-16T06:49:08+00:00][class.js][12345]
+
+class TPLogger2 extends TPLogger {
+  // your implementation, etc
+}
+```
+
+`Since 0.3` If you use express.js, you can also use the middleware provided to log errors passed on by request handlers in a centralize fashion:
 
 ```javascript
 var app = require('express')();
@@ -61,10 +88,10 @@ See them in action by running [this example](examples/options.js)
 
 ```javascript
 var logger = require('tp-logger')({
-  // stream for log() and info()
+  // stream for log() and info(). Not applicable for on the fly `Once` methods
   stdout: <writable stream instances. Default: process.stdout>,
 
-  // stream for error()
+  // stream for warn() and error(). Not applicable for on the fly `Once` methods
   stderr: <writable stream instances. Default: process.stderr>,
 
   // whether to use local time or UTC time
@@ -77,8 +104,31 @@ var logger = require('tp-logger')({
   // whether to log full path of the caller or just caller filename
   fullPath: <boolean. Default: false. Since 0.2>,
 
-  // whether to log with a third supplement of [log|info|err]
-  // default to true when stdout == stderr, otherwise false
-  logType: <boolean. Default: depends on whether stdout == stderr. Since 0.2>
+  // whether to log with a supplement of [log|info|err]
+  // enforced to true when stdout == stderr
+  logType: <boolean. Default: true when stdout == stderr. Since 0.2>,
+
+  // include process.pid
+  pid: <boolean. Default: false. Since 0.4>
 });
 ```
+
+## Class: TPLogger
+
+Subclass of native `Class: Console`. Since 0.4.
+
+#### new TPLogger([opt])
+
+Creates a new `TPLogger` instance by passing optional options `opt`, see [Options](#options) section for all available options.
+
+#### logger.meta([opt][, method])
+
+Generates meta info as string. Used as supplement before log messages. Since 0.4. Supports all [Options](#options) except `opt.stdout` and `opt.stderr`. The `method` argument is only useful when `opt.logType` is `true`, or both constructor `_opt.stdout` and `_opt.stderr` point to the same writable stream.
+
+#### logger.log|info|warn|error(...)
+
+Behaves exactly like native `Console`, plus `meta` method supplied supplement before intended log messages.
+
+#### logger.logOnce|infoOnce|warnOnce|errorOnce(opt, ...)
+
+Behaves like `TPLogger#log|info|warn|error`, but the first argument must be an object and treated as on the fly options to override constructor options behaviors (`opt.stdout` and `opt.stderr` are ignored).

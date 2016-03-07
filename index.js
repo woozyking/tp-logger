@@ -41,7 +41,7 @@ class TPLogger extends _Console {
 
     `opt` follows the same rule as constructor argument.
   */
-  meta(method, opt) {
+  meta(opt, method) {
     // allows on the fly opt, defaults to this._opt
     opt = opt || this._opt;
 
@@ -54,7 +54,6 @@ class TPLogger extends _Console {
 
     // if logType option is true, or when stdout and stderr are the same
     if (opt.logType || (this._opt.stdout && this._opt.stderr && (this._opt.stdout == this._opt.stderr))) {
-      // supplement of log type
       supp += util.format('[%s]', method || 'log');
     }
 
@@ -68,26 +67,29 @@ class TPLogger extends _Console {
 
   log() {
     super.log.apply(this, [
-      this.meta('log'),
+      this.meta(null, 'log'),
       util.format.apply(this, arguments)
     ]);
   }
 
   info() {
-    this.log.apply(this, arguments);
+    super.info.apply(this, [
+      this.meta(null, 'info'),
+      util.format.apply(this, arguments)
+    ]);
   }
 
   // Since 0.4.
   warn() {
     super.warn.apply(this, [
-      this.meta('warn'),
+      this.meta(null, 'warn'),
       util.format.apply(this, arguments)
     ]);
   }
 
   error() {
     super.error.apply(this, [
-      this.meta('error'),
+      this.meta(null, 'error'),
       util.format.apply(this, arguments)
     ]);
   }
@@ -98,13 +100,19 @@ class TPLogger extends _Console {
     var opt = args.shift() || {};
 
     super.log.apply(this, [
-      this.meta('log', opt),
+      this.meta(opt, 'log'),
       util.format.apply(this, args)
     ]);
   }
 
   infoOnce() {
-    this.logOnce.apply(this, arguments);
+    var args = Array.prototype.slice.call(arguments);
+    var opt = args.shift() || {};
+
+    super.info.apply(this, [
+      this.meta(opt, 'info'),
+      util.format.apply(this, args)
+    ]);
   }
 
   warnOnce(opt) {
@@ -112,7 +120,7 @@ class TPLogger extends _Console {
     var opt = args.shift() || {};
 
     super.warn.apply(this, [
-      this.meta('warn', opt),
+      this.meta(opt, 'warn'),
       util.format.apply(this, args)
     ]);
   }
@@ -122,7 +130,7 @@ class TPLogger extends _Console {
     var opt = args.shift() || {};
 
     super.error.apply(this, [
-      this.meta('error', opt),
+      this.meta(opt, 'error'),
       util.format.apply(this, args)
     ]);
   }

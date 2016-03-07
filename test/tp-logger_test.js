@@ -1,6 +1,7 @@
 var assert = require('assert');
+var sinon = require('sinon');
 var path = require('path');
-var Readable = require('stream').Readable;
+var Writable = require('stream').Writable;
 
 // test targets
 var tpLogger = require('../index');
@@ -43,7 +44,7 @@ describe('Class: TPLogger', function() {
     });
   });
 
-  describe('#meta(method[, opt])', function() {
+  describe('#meta([opt])', function() {
     it('should return a string with default supplements without arguments supplied', function() {
       var logger = new TPLogger();
       var actual = logger.meta();
@@ -57,8 +58,8 @@ describe('Class: TPLogger', function() {
       var pattern = /\[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\+|-)(\d{2}:\d{2}))\]\[(.+)\]/;
 
       [
-        new TPLogger({ localTs: true }).meta('log'),
-        new TPLogger().meta('log', { localTs: true })
+        new TPLogger({ localTs: true }).meta(),
+        new TPLogger().meta({ localTs: true })
       ].forEach(function(actual) {
         var parts = actual.match(pattern);
         var offset = parts[3].split(':');
@@ -78,8 +79,8 @@ describe('Class: TPLogger', function() {
       var pattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\+|-)\d{2}:\d{2}\]\[(.+)\]/;
 
       [
-        new TPLogger({ fullPath: true }).meta('log'),
-        new TPLogger().meta('log', { fullPath: true })
+        new TPLogger({ fullPath: true }).meta(),
+        new TPLogger().meta({ fullPath: true })
       ].forEach(function(actual) {
         assert(typeof actual === 'string');
         assert(actual.match(pattern)[2].split(path.sep).length > 1);
@@ -90,8 +91,8 @@ describe('Class: TPLogger', function() {
       var pattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\+|-)\d{2}:\d{2}\]\[.+\]\[(\w+)\]/;
 
       [
-        new TPLogger({ logType: true }).meta('log'),
-        new TPLogger().meta('log', { logType: true })
+        new TPLogger({ logType: true }).meta(),
+        new TPLogger().meta({ logType: true })
       ].forEach(function(actual) {
         assert(typeof actual === 'string');
         assert(actual.match(pattern)[2] === 'log');
@@ -103,7 +104,7 @@ describe('Class: TPLogger', function() {
         stdout: process.stdout,
         stderr: process.stdout
       });
-      var actual = logger.meta('log');
+      var actual = logger.meta();
       var pattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\+|-)\d{2}:\d{2}\]\[.+\]\[(\w+)\]/;
       var type = actual.match(pattern)[2];
 
@@ -112,7 +113,7 @@ describe('Class: TPLogger', function() {
 
       // meta's on the fly opt doesn't affect this behavior
       logger = new TPLogger();
-      actual = logger.meta('log', {
+      actual = logger.meta({
         stdout: process.stdout,
         stderr: process.stdout
       });
@@ -125,12 +126,118 @@ describe('Class: TPLogger', function() {
       var pattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\+|-)\d{2}:\d{2}\]\[.+\]\[(\d+)\]/;
 
       [
-        new TPLogger({ pid: true }).meta('log'),
-        new TPLogger().meta('log', { pid: true })
+        new TPLogger({ pid: true }).meta(),
+        new TPLogger().meta({ pid: true })
       ].forEach(function(actual) {
         assert(parseInt(actual.match(pattern)[2]) === process.pid);
         assert(typeof actual === 'string');
       });
+    });
+  });
+
+  describe('#log|info|warn|error()', function() {
+    it('should have supplements before intended message', function() {
+      var actual = '';
+      var writable = new Writable({
+        write: function(chunk, encoding, next) {
+          actual = chunk.toString();
+          next();
+        }
+      });
+      var logger = new TPLogger({
+        stdout: writable,
+        stderr: writable
+      });
+      var pattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00\]\[.+\]\[(log|info|warn|error)\]\WLoL/;
+      var methods = ['log', 'info', 'warn', 'error'];
+
+      for (var i = 0; i < methods.length; i++) {
+        logger[methods[i]]('LoL');
+        assert(pattern.test(actual));
+      }
+
+      writable.end();
+    });
+
+    it('should invoke #meta() method exactly once', function() {
+      var writable = new Writable({
+        write: function(chunk, encoding, next) {
+          next();
+        }
+      });
+      var logger = new TPLogger({
+        stdout: writable,
+        stderr: writable
+      });
+      var methods = ['log', 'info', 'warn', 'error'];
+
+      for (var i = 0; i < methods.length; i++) {
+        sinon.spy(logger, 'meta');
+        logger[methods[i]]('LoL');
+
+        assert(logger.meta.calledOnce);
+
+        logger.meta.restore();
+      }
+
+      writable.end();
+    });
+  });
+
+  describe('#logOnce|infoOnce|warnOnce|errorOnce()', function() {
+    it('alter the supplements by supplying first argument as opt', function() {
+      var actual = '';
+      var writable = new Writable({
+        write: function(chunk, encoding, next) {
+          actual = chunk.toString();
+          next();
+        }
+      });
+      var logger = new TPLogger({
+        stdout: writable,
+        stderr: writable
+      });
+      var noOptPattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00\]\[.+\]\[(log|info|warn|error)\]\WLoL/;
+      var pattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00\]\[.+\]\[(log|info|warn|error)\]\[\d+\]\WLoL/;
+      var methods = ['logOnce', 'infoOnce', 'warnOnce', 'errorOnce'];
+      var opt = { pid: true };
+
+      for (var i = 0; i < methods.length; i++) {
+        logger[methods[i]](opt, 'LoL');
+        assert(pattern.test(actual));
+
+        // test that non-once method follows the constructor opt
+        logger[methods[i].slice(0, -4)]('LoL');
+        assert(noOptPattern.test(actual));
+      }
+
+      writable.end();
+    });
+
+    it('should invoke #meta() method exactly once', function() {
+      var writable = new Writable({
+        write: function(chunk, encoding, next) {
+          next();
+        }
+      });
+      var logger = new TPLogger({
+        stdout: writable,
+        stderr: writable
+      });
+      var methods = ['logOnce', 'infoOnce', 'warnOnce', 'errorOnce'];
+      var opt = { pid: true };
+
+      for (var i = 0; i < methods.length; i++) {
+        sinon.spy(logger, 'meta');
+        logger[methods[i]](opt, 'LoL');
+
+        assert(logger.meta.calledOnce);
+        assert(logger.meta.calledWith(opt, methods[i].slice(0, -4)));
+
+        logger.meta.restore();
+      }
+
+      writable.end();
     });
   });
 });
@@ -168,4 +275,8 @@ describe('Function wrapper: tpLogger([opt])', function() {
 
     assert.deepEqual(logger._opt, opt);
   });
+});
+
+describe('Express middleware', function() {
+  // TODO
 });
