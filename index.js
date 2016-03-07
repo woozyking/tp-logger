@@ -10,7 +10,7 @@ var moment = require('moment');
 /*
   Class: TPLogger
 
-  Subclass of native Console. Since 0.4.
+  Subclass of native Console. Since 1.0.
 */
 class TPLogger extends _Console {
   /*
@@ -23,7 +23,7 @@ class TPLogger extends _Console {
       tsFormat: <string. See moment.js formatting documentation>,
       fullPath: <boolean. Default: false. Since 0.2>,
       logType: <boolean. Default: depends on whether stdout == stderr. Since 0.2>,
-      pid: <boolean. Default: false. Since 0.4>
+      pid: <boolean. Default: false. Since 1.0>
     }
   */
   constructor(opt) {
@@ -37,7 +37,7 @@ class TPLogger extends _Console {
   }
 
   /*
-    Generate meta info as string. Used as supplement before log msg Since 0.4.
+    Generate meta info as string. Used as supplement before log msg Since 1.0.
 
     `opt` follows the same rule as constructor argument.
   */
@@ -79,7 +79,7 @@ class TPLogger extends _Console {
     ]);
   }
 
-  // Since 0.4.
+  // Since 1.0.
   warn() {
     super.warn.apply(this, [
       this.meta(null, 'warn'),
@@ -94,7 +94,7 @@ class TPLogger extends _Console {
     ]);
   }
 
-  // on the fly opt override. Since 0.4.
+  // on the fly opt override. Since 1.0.
   logOnce() {
     var args = Array.prototype.slice.call(arguments);
     var opt = args.shift() || {};

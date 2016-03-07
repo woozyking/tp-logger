@@ -1,4 +1,4 @@
-# v0.4 (2016-03-06)
+# v1.0 (2016-03-06)
 
 This version went through a rewrite using ES6 style class instead of the previous "monkey-patching" way.
 
@@ -7,6 +7,7 @@ This version went through a rewrite using ES6 style class instead of the previou
 * __Adds__ `warn` method.
 * __Adds__ `logOnce`, `infoOnce`, `warnOnce`, and `errorOnce` methods for on the fly opt adaptation that once.
 * __Adds__ `meta` method that returns log message supplement portion.
+* __BREAKS__ Node.js 0.12 support due to the ES6 style class. Minimum Node.js version must be >= 4.0.
 
 # v0.3 (2016-02-20)
 

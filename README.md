@@ -2,11 +2,13 @@
 
 Supplement log messages with a Timestamp and caller's Path, with options for more.
 
-## Install
+__Note:__ supports only `Node.js >= 4.0` since 1.0.
+
+### Install
 
 `$ npm install -save tp-logger`
 
-## Usage
+### Usage
 
 ```javascript
 var logger = require('tp-logger')(/* optional options, see Options below */);
@@ -18,7 +20,7 @@ logger.log('lol: %d hours', 2);
 logger.info('dota');
 // [2015-12-16T06:49:08+00:00][vanilla.js] dota
 
-logger.warn('cs:go'); // added since 0.4
+logger.warn('cs:go'); // added since 1.0
 // [2015-12-16T06:49:08+00:00][vanilla.js] cs:go
 
 logger.error(new Error('helldivers').stack);
@@ -41,7 +43,7 @@ console = require('tp-logger')(/* optional options, see Options below */);
 // ...
 ```
 
-`Since 0.4` The underlying implementation has changed to an ES6 style class that extends the Node.js native `Class: Console`, making it simpler to extend. See [Class: TPLogger](#class-tplogger) section for details.
+`Since 1.0` The underlying implementation has changed to an ES6 style class that extends the Node.js native `Class: Console`, making it simpler to extend. See [Class: TPLogger](#class-tplogger) section for details.
 
 ```javascript
 var TPLogger = require('tp-logger').TPLogger;
@@ -82,7 +84,7 @@ app.get('/', function(req, res, next) {
 app.use(loggerMw);
 ```
 
-## Options
+### Options
 
 See them in action by running [this example](examples/options.js)
 
@@ -109,26 +111,26 @@ var logger = require('tp-logger')({
   logType: <boolean. Default: true when stdout == stderr. Since 0.2>,
 
   // include process.pid
-  pid: <boolean. Default: false. Since 0.4>
+  pid: <boolean. Default: false. Since 1.0>
 });
 ```
 
-## Class: TPLogger
+### Class: TPLogger
 
-Subclass of native `Class: Console`. Since 0.4.
+Subclass of native `Class: Console`. Since 1.0.
 
-#### new TPLogger([opt])
+##### new TPLogger([opt])
 
 Creates a new `TPLogger` instance by passing optional options `opt`, see [Options](#options) section for all available options.
 
-#### logger.meta([opt][, method])
+##### logger.meta([opt][, method])
 
-Generates meta info as string. Used as supplement before log messages. Since 0.4. Supports all [Options](#options) except `opt.stdout` and `opt.stderr`. The `method` argument is only useful when `opt.logType` is `true`, or both constructor `_opt.stdout` and `_opt.stderr` point to the same writable stream.
+Generates meta info as string. Used as supplement before log messages. Since 1.0. Supports all [Options](#options) except `opt.stdout` and `opt.stderr`. The `method` argument is only useful when `opt.logType` is `true`, or both constructor `_opt.stdout` and `_opt.stderr` point to the same writable stream.
 
-#### logger.log|info|warn|error(...)
+##### logger.log|info|warn|error(...)
 
 Behaves exactly like native `Console`, plus `meta` method supplied supplement before intended log messages.
 
-#### logger.logOnce|infoOnce|warnOnce|errorOnce(opt, ...)
+##### logger.logOnce|infoOnce|warnOnce|errorOnce(opt, ...)
 
 Behaves like `TPLogger#log|info|warn|error`, but the first argument must be an object and treated as on the fly options to override constructor options behaviors (`opt.stdout` and `opt.stderr` are ignored).
