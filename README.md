@@ -7,7 +7,7 @@
 
 Supplement log messages with a Timestamp and caller's Path, with options for more.
 
-__Note:__ supports only `Node.js >= 4.0` since 1.0.
+__Note:__ `v1.0` broke support for Node.js version < 4.0; `v1.1` brings the support back, recommended for maximum compatibility.
 
 ### Install
 
@@ -48,7 +48,7 @@ console = require('tp-logger')(/* optional options, see Options below */);
 // ...
 ```
 
-`Since 1.0` The underlying implementation has changed to an ES6 style class that extends the Node.js native `Class: Console`, making it simpler to extend. See [Class: TPLogger](#class-tplogger) section for details.
+~~`Since 1.0`~~ `Since 1.1` the underlying implementation has changed to an ~~ES6~~ ES5 style class that extends the Node.js native `Class: Console`, making it simpler to extend. See [Class: TPLogger](#class-tplogger) section for details.
 
 ```javascript
 var TPLogger = require('tp-logger').TPLogger;

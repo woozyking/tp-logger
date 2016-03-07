@@ -1,6 +1,6 @@
 {
   "name": "tp-logger",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Supplement log messages with a Timestamp and caller's Path, with options for more.",
   "main": "index.js",
   "scripts": {
