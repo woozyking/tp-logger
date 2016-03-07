@@ -188,12 +188,11 @@ describe('Class: TPLogger', function() {
   describe('#logOnce|infoOnce|warnOnce|errorOnce()', function() {
     it('alter the supplements by supplying first argument as opt', function() {
       var actual = '';
-      var writable = new Writable({
-        write: function(chunk, encoding, next) {
-          actual = chunk.toString();
-          next();
-        }
-      });
+      var writable = new Writable();
+      writable._write = function(chunk, encoding, next) {
+        actual = chunk.toString();
+        next();
+      };
       var logger = new TPLogger({
         stdout: writable,
         stderr: writable
