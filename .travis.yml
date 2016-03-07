@@ -8,4 +8,4 @@ script: npm run-script cover
 after_script: npm run-script codeclimate
 addons:
   code_climate:
-    repo_token: ef671eeca084acdb3d1d550a8dfbab06198d88284d2b766b6c4c3c83e6778fca
+    repo_token: f0690decd5e4653d869e1e3f71fa1a6c8f6fa2c199486e235675c43fb9da3b04
