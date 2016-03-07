@@ -1,5 +1,10 @@
 # tp-logger
 
+[![Build Status](https://travis-ci.org/woozyking/tp-logger.svg?branch=master)](https://travis-ci.org/woozyking/tp-logger)
+[![Dependency Status](https://gemnasium.com/woozyking/tp-logger.svg)](https://gemnasium.com/woozyking/tp-logger)
+[![Test Coverage](https://codeclimate.com/github/woozyking/tp-logger/badges/coverage.svg)](https://codeclimate.com/github/woozyking/tp-logger/coverage)
+[![Code Climate](https://codeclimate.com/github/woozyking/tp-logger/badges/gpa.svg)](https://codeclimate.com/github/woozyking/tp-logger)
+
 Supplement log messages with a Timestamp and caller's Path, with options for more.
 
 __Note:__ supports only `Node.js >= 4.0` since 1.0.
