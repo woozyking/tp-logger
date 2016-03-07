@@ -1,3 +1,7 @@
+# v1.0.1 (2016-03-07)
+
+* __Fixes__ several bug risks reported by code climate.
+
 # v1.0 (2016-03-06)
 
 This version went through a rewrite using ES6 style class instead of the previous "monkey-patching" way.

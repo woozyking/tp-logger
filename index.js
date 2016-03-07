@@ -53,7 +53,7 @@ class TPLogger extends _Console {
     var supp = util.format('[%s][%s]', ts, callerPath);
 
     // if logType option is true, or when stdout and stderr are the same
-    if (opt.logType || (this._opt.stdout && this._opt.stderr && (this._opt.stdout == this._opt.stderr))) {
+    if (opt.logType || (this._opt.stdout && this._opt.stderr && (this._opt.stdout === this._opt.stderr))) {
       supp += util.format('[%s]', method || 'log');
     }
 
@@ -115,7 +115,7 @@ class TPLogger extends _Console {
     ]);
   }
 
-  warnOnce(opt) {
+  warnOnce() {
     var args = Array.prototype.slice.call(arguments);
     var opt = args.shift() || {};
 
@@ -125,7 +125,7 @@ class TPLogger extends _Console {
     ]);
   }
 
-  errorOnce(opt) {
+  errorOnce() {
     var args = Array.prototype.slice.call(arguments);
     var opt = args.shift() || {};
 
